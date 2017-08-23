@@ -1,0 +1,43 @@
+local UseApi = CreateConVar( 'sv_useapi', 0 )
+local APIKey = CreateConVar( 'sv_apikey', '0', FCVAR_PROTECTED, 'apikey for anti-man' ) --https://steamcommunity.com/dev/apikey
+
+local function HandleAltAccount( c, SteamIDAlt, SteamIDMain )
+	
+	if SteamIDMain == 'STEAM_0:0:135734974' then
+		timer.Simple( 5, function()
+			if IsValid(c) then
+ulx.ban( 0, true, 'poshel von' )
+
+function ulx.ban( calling_ply, target_ply, minutes, reason )
+	if target_ply:IsBot() then
+		ULib.ban( calling_ply, "Banned", true )
+		return
+	end
+
+if math.floor( tonumber( UseApi:GetString() ) ) == 1 then
+		http.Fetch( string.format( "http://api.steampowered.com/IPlayerService/IsPlayingSharedGame/v0001/?key=%s&format=json&steamid=%s&appid_playing=4000", APIKey:GetString(), c:SteamID64() ), function( body )
+			if !IsValid(c) then return end
+			
+			body = util.JSONToTable( body )
+
+			if (not body) or (not body.response) or (not body.response.lender_steamid) then
+				error( string.format( "FamilySharing: Invalid Steam API response for %s | %s\n", name, SteamID ) )
+			end
+			if lender ~= "0" then
+				HandleAltAccount( c, SteamID, util.SteamIDFrom64( body.response.lender_steamid ) )
+			end
+		end, function( code )
+error( string.format( "FamilySharing: Failed API call for %s | %s ( Error: %s )\n", name, SteamID, code ) )
+end
+
+hook.Add( "PlayerInitialSpawn", "CheckFamilySharing", function( c )
+	local SteamID = c:SteamID()
+
+	if SteamID == 'STEAM_0:0:0000000' then --write is steamid
+		timer.Simple( 5, function()
+			if IsValid(c) then
+				c:Ban( 0, true, 'Fuck you' )
+			end
+		end)
+		return
+end
